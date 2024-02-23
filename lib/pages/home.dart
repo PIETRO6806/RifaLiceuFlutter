@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'rifa.dart'; // Import the new page
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key});
@@ -19,7 +20,7 @@ class HomePage extends StatelessWidget {
         centerTitle: true,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0), // Set the desired margin for the grid
+        padding: EdgeInsets.all(16.0),
         child: GridView.builder(
           key: PageStorageKey('myGridView'),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -46,8 +47,8 @@ class ClickableCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Handle click event for the card
-        print('Clicked on card $index');
+        // Navigate to RifaPage and pass the selected index
+        Navigator.pushNamed(context, '/rifa', arguments: index);
       },
       child: Card(
         color: Colors.white,
