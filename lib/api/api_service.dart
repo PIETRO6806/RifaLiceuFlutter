@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:rifa_liceu_flutter/models/user_model.dart';
 
 class ApiService {
   static final String baseUrl = 'https://rifa-liceu.glitch.me';
@@ -9,7 +10,7 @@ class ApiService {
       final response = await http.post(
         Uri.parse('$baseUrl/api/users/add'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'username': username, 'email': email, 'password': password}),
+        body: jsonEncode({'nome': username, 'email': email, 'senha': password, 'qtasRifas' : 0}),
       );
 
       if (response.statusCode == 200) {
@@ -28,7 +29,7 @@ class ApiService {
     }
   }
 
-  static Future<bool> loginUser(String email, String password) async {
+  static Future<User?> loginUser(String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/api/users/login'),
@@ -37,19 +38,20 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        // Login successful
-        return true;
+        // Parse the response body to get a User object
+        final Map<String, dynamic> userData = jsonDecode(response.body);
+        return User.fromJson(userData);
       } else if (response.statusCode == 400) {
         // Invalid email or password
-        return false;
+        return null;
       } else {
         // Other errors
         print('Error: ${response.statusCode}');
-        return false;
+        return null;
       }
     } catch (e) {
       print('Error: $e');
-      return false;
+      return null;
     }
   }
 }
