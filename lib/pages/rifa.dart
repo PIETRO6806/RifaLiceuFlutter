@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rifa_liceu_flutter/controllers/rifa_controller.dart';
 import 'package:rifa_liceu_flutter/utils/user_preferences.dart'; // Replace with your actual package name
 
 class RifaPage extends StatefulWidget {
@@ -7,6 +9,7 @@ class RifaPage extends StatefulWidget {
 }
 
 class _RifaPageState extends State<RifaPage> {
+  final RifaController rifaController = Get.put(RifaController());
   // Additional controllers for the input fields
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController telefoneController = TextEditingController();
@@ -113,10 +116,17 @@ class _RifaPageState extends State<RifaPage> {
             ElevatedButton(
               onPressed: isButtonEnabled()
                   ? () {
+                // Pass the filled values to RifaController
+                rifaController.setRifaFields(
+                  nomeController.text,
+                  telefoneController.text,
+                  formaPagamento!,
+                  vendedorController.text,
+                );
+
                 // Perform venda confirmation logic here
-                // You can access the filled values using the controllers
-                // For example: nomeController.text, telefoneController.text, etc.
-                // You may also navigate to a confirmation page or show a dialog.
+                int rifaNumber = index; // Replace with your actual Rifa number
+                rifaController.addNewRifa(rifaNumber);
               }
                   : null,
               child: Text('Confirmar Venda'),

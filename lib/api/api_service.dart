@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:rifa_liceu_flutter/models/rifa_model.dart';
 import 'package:rifa_liceu_flutter/models/user_model.dart';
 
 class ApiService {
@@ -52,6 +53,37 @@ class ApiService {
     } catch (e) {
       print('Error: $e');
       return null;
+    }
+  }
+
+  static Future<bool> addNewRifa(Rifa rifa) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/api/rifas/add'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'numeroRifa': rifa.numeroRifa,
+          'nome': rifa.nome,
+          'telefone': rifa.telefone,
+          'pagamento': rifa.pagamento,
+          'vendedor': rifa.vendedor,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        // Rifa added successfully
+        return true;
+      } else if (response.statusCode == 400) {
+        // Invalid data or existing Rifa number
+        return false;
+      } else {
+        // Other errors
+        print('Error: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return false;
     }
   }
 }
