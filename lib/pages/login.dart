@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:rifa_liceu_flutter/pages/home.dart';
+import 'package:get/get.dart';
+import 'package:rifa_liceu_flutter/controllers/login_controller.dart';
 import 'package:rifa_liceu_flutter/pages/register.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final LoginController loginController = LoginController();
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,7 @@ class LoginPage extends StatelessWidget {
               children: [
                 TextFormField(
                   controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: 'Email',
                   ),
@@ -55,19 +58,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {
-                    // Simulate successful login, you can replace this with actual authentication logic
-                    // Access the entered email and password using the controllers
-                    String email = emailController.text;
-                    String password = passwordController.text;
-
-                    // You can perform authentication logic here
-                    // For simplicity, let's just print the email and password for now
-                    print('Email: $email, Password: $password');
-
-                    // Once logged in, navigate to the home page
-                    Navigator.pushReplacementNamed(context, '/home');
-                  },
+                  onPressed: () => loginController.login(emailController, passwordController),
                   child: const Text('Login'),
                 ),
                 SizedBox(height: 16),
