@@ -51,6 +51,7 @@ class _RifaPageState extends State<RifaPage> {
             // Input field for Telefone
             TextFormField(
               controller: telefoneController,
+              keyboardType: TextInputType.phone, // Set the keyboard type to phone
               decoration: InputDecoration(labelText: 'Telefone:'),
             ),
             SizedBox(height: 10.0),

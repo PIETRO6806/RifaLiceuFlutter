@@ -1,6 +1,8 @@
 // register.dart
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rifa_liceu_flutter/controllers/register_controller.dart';
 import 'package:rifa_liceu_flutter/pages/home.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -50,6 +52,7 @@ class RegisterPage extends StatelessWidget {
                 SizedBox(height: 16),
                 TextFormField(
                   controller: emailController,
+                  keyboardType: TextInputType.emailAddress, // Set the keyboard type to email address
                   decoration: InputDecoration(
                     labelText: 'Email',
                   ),
@@ -65,18 +68,12 @@ class RegisterPage extends StatelessWidget {
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
-                    // Simulate successful registration, you can replace this with actual registration logic
-                    // Access the entered username, email, and password using the controllers
-                    String username = usernameController.text;
-                    String email = emailController.text;
-                    String password = passwordController.text;
-
-                    // You can perform registration logic here
-                    // For simplicity, let's just print the values for now
-                    print('Username: $username, Email: $email, Password: $password');
-
-                    // Once registered, navigate to the home page
-                    Navigator.pushReplacementNamed(context, '/home');
+                    // Pass the controllers to RegisterController using Get.find()
+                    Get.find<RegisterController>().register(
+                      usernameController,
+                      emailController,
+                      passwordController,
+                    );
                   },
                   child: const Text('Register'),
                 ),
