@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rifa_liceu_flutter/utils/user_preferences.dart'; // Replace with your actual package name
 
 class RifaPage extends StatefulWidget {
   @override
@@ -18,6 +19,23 @@ class _RifaPageState extends State<RifaPage> {
         telefoneController.text.isNotEmpty &&
         vendedorController.text.isNotEmpty &&
         formaPagamento != null; // Forma de Pagamento must be selected;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch user information and set Vendedor controller
+    setUserInformation();
+  }
+
+  Future<void> setUserInformation() async {
+    Map<String, dynamic> userInfo = await UserPreferences.getUserInfo();
+    String userName = userInfo['userName'] ?? '';
+
+    setState(() {
+      // Set the username as read-only in the Vendedor controller
+      vendedorController.text = userName;
+    });
   }
 
   @override
@@ -85,7 +103,10 @@ class _RifaPageState extends State<RifaPage> {
             // Input field for Vendedor's name
             TextFormField(
               controller: vendedorController,
-              decoration: InputDecoration(labelText: "Vendedor:"),
+              decoration: InputDecoration(
+                labelText: "Vendedor:",
+                enabled: false, // Make the field read-only
+              ),
             ),
             SizedBox(height: 20.0),
             // Button to confirm venda
