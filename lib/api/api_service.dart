@@ -86,4 +86,27 @@ class ApiService {
       return false;
     }
   }
+
+  static Future<List<int>> getAllSoldRifaNumbers() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/rifas/vendidas'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the response body to get a List of sold rifa numbers
+        final List<dynamic> rifaNumbers = jsonDecode(response.body);
+        return rifaNumbers.cast<int>().toList();
+      } else {
+        // Handle other status codes or errors
+        print('Error: ${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error: $e');
+      return [];
+    }
+  }
+
 }
