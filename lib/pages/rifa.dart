@@ -29,6 +29,14 @@ class _RifaPageState extends State<RifaPage> {
     setUserInformation();
   }
 
+  @override
+  void didUpdateWidget(covariant RifaPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Reset the state when the widget is updated
+    setUserInformation();
+  }
+
   Future<void> setUserInformation() async {
     Map<String, dynamic> userInfo = await UserPreferences.getUserInfo();
     String userName = userInfo['userName'] ?? '';
@@ -108,6 +116,30 @@ class _RifaPageState extends State<RifaPage> {
                 enabled: false,
               ),
             ),
+            if (isSold)
+              Column(
+                children: [
+                  SizedBox(height: 20.0),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'VENDIDO',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: isButtonEnabled()
@@ -124,26 +156,6 @@ class _RifaPageState extends State<RifaPage> {
               }
                   : null,
               child: Text('Confirmar Venda'),
-            ),
-            if (isSold)
-              SizedBox(height: 20.0),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.red,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Center(
-                child: Text(
-                  'VENDIDO',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ),
           ],
         ),
