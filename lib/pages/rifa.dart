@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rifa_liceu_flutter/controllers/rifa_controller.dart';
-import 'package:rifa_liceu_flutter/utils/user_preferences.dart'; // Replace with your actual package name
+import 'package:rifa_liceu_flutter/utils/user_preferences.dart';
+import 'package:rifa_liceu_flutter/api/api_service.dart';
 
 class RifaPage extends StatefulWidget {
   @override
@@ -10,24 +11,21 @@ class RifaPage extends StatefulWidget {
 
 class _RifaPageState extends State<RifaPage> {
   final RifaController rifaController = Get.put(RifaController());
-  // Additional controllers for the input fields
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController telefoneController = TextEditingController();
-  String? formaPagamento; // Default value for Forma de Pagamento is null
+  String? formaPagamento;
   final TextEditingController vendedorController = TextEditingController();
 
   bool isButtonEnabled() {
-    // Check if all required fields are filled
     return nomeController.text.isNotEmpty &&
         telefoneController.text.isNotEmpty &&
         vendedorController.text.isNotEmpty &&
-        formaPagamento != null; // Forma de Pagamento must be selected;
+        formaPagamento != null;
   }
 
   @override
   void initState() {
     super.initState();
-    // Fetch user information and set Vendedor controller
     setUserInformation();
   }
 
@@ -36,15 +34,16 @@ class _RifaPageState extends State<RifaPage> {
     String userName = userInfo['userName'] ?? '';
 
     setState(() {
-      // Set the username as read-only in the Vendedor controller
       vendedorController.text = userName;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Get the selected index from the arguments
-    final int index = ModalRoute.of(context)?.settings.arguments as int ?? 0;
+    final Map<String, dynamic> arguments =
+    ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+    final int index = arguments['index'] ?? 0;
+    final bool isSold = arguments['isSold'] ?? false;
 
     return Scaffold(
       appBar: AppBar(
@@ -63,20 +62,19 @@ class _RifaPageState extends State<RifaPage> {
               style: TextStyle(fontSize: 24.0),
             ),
             SizedBox(height: 20.0),
-            // Input field for Nome
             TextFormField(
               controller: nomeController,
               decoration: InputDecoration(labelText: 'Nome:'),
+              readOnly: isSold,
             ),
             SizedBox(height: 10.0),
-            // Input field for Telefone
             TextFormField(
               controller: telefoneController,
-              keyboardType: TextInputType.phone, // Set the keyboard type to phone
+              keyboardType: TextInputType.phone,
               decoration: InputDecoration(labelText: 'Telefone:'),
+              readOnly: isSold,
             ),
             SizedBox(height: 10.0),
-            // Radio buttons for Forma de Pagamento
             Text('Forma de Pagamento:'),
             Row(
               children: [
@@ -103,20 +101,17 @@ class _RifaPageState extends State<RifaPage> {
               ],
             ),
             SizedBox(height: 10.0),
-            // Input field for Vendedor's name
             TextFormField(
               controller: vendedorController,
               decoration: InputDecoration(
                 labelText: "Vendedor:",
-                enabled: false, // Make the field read-only
+                enabled: false,
               ),
             ),
             SizedBox(height: 20.0),
-            // Button to confirm venda
             ElevatedButton(
               onPressed: isButtonEnabled()
                   ? () {
-                // Pass the filled values to RifaController
                 rifaController.setRifaFields(
                   nomeController.text,
                   telefoneController.text,
@@ -124,12 +119,31 @@ class _RifaPageState extends State<RifaPage> {
                   vendedorController.text,
                 );
 
-                // Perform venda confirmation logic here
-                int rifaNumber = index; // Replace with your actual Rifa number
+                int rifaNumber = index;
                 rifaController.addNewRifa(rifaNumber);
               }
                   : null,
               child: Text('Confirmar Venda'),
+            ),
+            if (isSold)
+              SizedBox(height: 20.0),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Center(
+                child: Text(
+                  'VENDIDO',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         ),

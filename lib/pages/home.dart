@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rifa_liceu_flutter/api/api_service.dart'; // Import the ApiService
+import 'package:rifa_liceu_flutter/api/api_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -50,9 +50,18 @@ class _HomePageState extends State<HomePage> {
           ),
           itemCount: 1500,
           itemBuilder: (context, index) {
+            bool isSold = soldRifaNumbers.contains(index + 1);
+
             return ClickableCard(
               index: index + 1,
-              isSold: soldRifaNumbers.contains(index + 1),
+              isSold: isSold,
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  '/rifa',
+                  arguments: {'index': index + 1, 'isSold': isSold},
+                );
+              },
             );
           },
         ),
@@ -64,16 +73,14 @@ class _HomePageState extends State<HomePage> {
 class ClickableCard extends StatelessWidget {
   final int index;
   final bool isSold;
+  final VoidCallback? onPressed;
 
-  ClickableCard({required this.index, required this.isSold});
+  ClickableCard({required this.index, required this.isSold, this.onPressed});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        // Navigate to RifaPage and pass the selected index
-        Navigator.pushNamed(context, '/rifa', arguments: index);
-      },
+      onTap: onPressed,
       child: Card(
         color: isSold ? Colors.red : Colors.white,
         shape: RoundedRectangleBorder(

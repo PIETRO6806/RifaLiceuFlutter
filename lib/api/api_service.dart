@@ -109,4 +109,29 @@ class ApiService {
     }
   }
 
+  static Future<Rifa?> getRifaByNumero(int numeroRifa) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/rifas/getByNumero/$numeroRifa'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the response body to get a Rifa object
+        final Map<String, dynamic> rifaData = jsonDecode(response.body);
+        return Rifa.fromJson(rifaData);
+      } else if (response.statusCode == 404) {
+        // Rifa not found for the given number
+        return null;
+      } else {
+        // Other errors
+        print('Error: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error: $e');
+      return null;
+    }
+  }
+
 }

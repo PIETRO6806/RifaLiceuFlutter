@@ -14,6 +14,14 @@ class Rifa {
     this.vendedor = "",
   });
 
+  // Named constructor for creating a Rifa instance from a Map (e.g., JSON)
+  Rifa.fromJson(Map<String, dynamic> json)
+      : numeroRifa = json['numeroRifa'] ?? 0,
+        nome = json['nome'] ?? "",
+        telefone = json['telefone'] ?? "",
+        pagamento = json['pagamento'] ?? "",
+        vendedor = json['vendedor'] ?? "";
+
   // Factory constructor to create an instance from a Map
   factory Rifa.fromMap(Map<String, dynamic> map) {
     return Rifa(
