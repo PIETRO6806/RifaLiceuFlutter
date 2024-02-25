@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rifa_liceu_flutter/controllers/rifa_controller.dart';
+import 'package:rifa_liceu_flutter/models/rifa_model.dart';
 import 'package:rifa_liceu_flutter/utils/user_preferences.dart';
 import 'package:rifa_liceu_flutter/api/api_service.dart';
 
@@ -15,6 +16,9 @@ class _RifaPageState extends State<RifaPage> {
   final TextEditingController telefoneController = TextEditingController();
   String? formaPagamento;
   final TextEditingController vendedorController = TextEditingController();
+  final FocusNode nomeFocus = FocusNode();
+  final FocusNode telefoneFocus = FocusNode();
+  final FocusNode vendedorFocus = FocusNode();
 
   bool isButtonEnabled() {
     return nomeController.text.isNotEmpty &&
@@ -46,12 +50,42 @@ class _RifaPageState extends State<RifaPage> {
     });
   }
 
+  // New method to fetch Rifa details from the API
+  Future<void> fetchRifaDetails(int rifaNumber) async {
+    try {
+      // Call the ApiService to get Rifa details by number
+      Rifa? rifa = await ApiService.getRifaByNumero(rifaNumber);
+
+      if (rifa != null) {
+        // If Rifa is sold, fill the fields and disable editing
+        setState(() {
+          nomeController.text = rifa.nome;
+          telefoneController.text = rifa.telefone;
+          vendedorController.text = rifa.vendedor;
+          formaPagamento = rifa.pagamento;
+
+          // Disable text fields
+          nomeFocus.canRequestFocus = false;
+          telefoneFocus.canRequestFocus = false;
+          vendedorFocus.canRequestFocus = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching Rifa details: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> arguments =
     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     final int index = arguments['index'] ?? 0;
     final bool isSold = arguments['isSold'] ?? false;
+
+    // Fetch Rifa details if it is sold
+    if (isSold) {
+      fetchRifaDetails(index);
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -74,6 +108,7 @@ class _RifaPageState extends State<RifaPage> {
               controller: nomeController,
               decoration: InputDecoration(labelText: 'Nome:'),
               readOnly: isSold,
+              focusNode: nomeFocus,
             ),
             SizedBox(height: 10.0),
             TextFormField(
@@ -81,6 +116,7 @@ class _RifaPageState extends State<RifaPage> {
               keyboardType: TextInputType.phone,
               decoration: InputDecoration(labelText: 'Telefone:'),
               readOnly: isSold,
+              focusNode: telefoneFocus,
             ),
             SizedBox(height: 10.0),
             Text('Forma de Pagamento:'),
@@ -88,8 +124,10 @@ class _RifaPageState extends State<RifaPage> {
               children: [
                 Radio(
                   value: 'Pix',
-                  groupValue: formaPagamento,
-                  onChanged: (value) {
+                  groupValue: isSold ? formaPagamento : null,
+                  onChanged: isSold
+                      ? null
+                      : (value) {
                     setState(() {
                       formaPagamento = value as String;
                     });
@@ -98,8 +136,10 @@ class _RifaPageState extends State<RifaPage> {
                 Text('Pix'),
                 Radio(
                   value: 'Dinheiro',
-                  groupValue: formaPagamento,
-                  onChanged: (value) {
+                  groupValue: isSold ? formaPagamento : null,
+                  onChanged: isSold
+                      ? null
+                      : (value) {
                     setState(() {
                       formaPagamento = value as String;
                     });
@@ -115,6 +155,7 @@ class _RifaPageState extends State<RifaPage> {
                 labelText: "Vendedor:",
                 enabled: false,
               ),
+              focusNode: vendedorFocus,
             ),
             if (isSold)
               Column(
@@ -142,7 +183,7 @@ class _RifaPageState extends State<RifaPage> {
               ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: isButtonEnabled()
+              onPressed: isButtonEnabled() && !isSold
                   ? () {
                 rifaController.setRifaFields(
                   nomeController.text,
