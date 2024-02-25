@@ -20,6 +20,9 @@ class _RifaPageState extends State<RifaPage> {
   final FocusNode telefoneFocus = FocusNode();
   final FocusNode vendedorFocus = FocusNode();
 
+  bool isLoading = false;
+  late int index; // Declare index at class level
+
   bool isButtonEnabled() {
     return nomeController.text.isNotEmpty &&
         telefoneController.text.isNotEmpty &&
@@ -50,21 +53,17 @@ class _RifaPageState extends State<RifaPage> {
     });
   }
 
-  // New method to fetch Rifa details from the API
   Future<void> fetchRifaDetails(int rifaNumber) async {
     try {
-      // Call the ApiService to get Rifa details by number
       Rifa? rifa = await ApiService.getRifaByNumero(rifaNumber);
 
       if (rifa != null) {
-        // If Rifa is sold, fill the fields and disable editing
         setState(() {
           nomeController.text = rifa.nome;
           telefoneController.text = rifa.telefone;
           vendedorController.text = rifa.vendedor;
           formaPagamento = rifa.pagamento;
 
-          // Disable text fields
           nomeFocus.canRequestFocus = false;
           telefoneFocus.canRequestFocus = false;
           vendedorFocus.canRequestFocus = false;
@@ -75,14 +74,71 @@ class _RifaPageState extends State<RifaPage> {
     }
   }
 
+  Future<void> handleConfirmarVenda() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      rifaController.setRifaFields(
+        nomeController.text,
+        telefoneController.text,
+        formaPagamento!,
+        vendedorController.text,
+      );
+
+      // Use the class-level index here
+      await rifaController.addNewRifa(index);
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Success'),
+          content: Text('Sale confirmed successfully.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } catch (e) {
+      print('Error confirming sale: $e');
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Error'),
+          content: Text('Failed to confirm sale. Please try again.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map<String, dynamic> arguments =
     ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    final int index = arguments['index'] ?? 0;
+    index = arguments['index'] ?? 0; // Assign the value to the class-level index
     final bool isSold = arguments['isSold'] ?? false;
 
-    // Fetch Rifa details if it is sold
     if (isSold) {
       fetchRifaDetails(index);
     }
@@ -185,15 +241,21 @@ class _RifaPageState extends State<RifaPage> {
             ElevatedButton(
               onPressed: isButtonEnabled() && !isSold
                   ? () {
-                rifaController.setRifaFields(
-                  nomeController.text,
-                  telefoneController.text,
-                  formaPagamento!,
-                  vendedorController.text,
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => AlertDialog(
+                    content: Row(
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(width: 16.0),
+                        Text('Confirming sale...'),
+                      ],
+                    ),
+                  ),
                 );
 
-                int rifaNumber = index;
-                rifaController.addNewRifa(rifaNumber);
+                handleConfirmarVenda();
               }
                   : null,
               child: Text('Confirmar Venda'),
