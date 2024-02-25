@@ -124,7 +124,7 @@ class _RifaPageState extends State<RifaPage> {
               children: [
                 Radio(
                   value: 'Pix',
-                  groupValue: isSold ? formaPagamento : null,
+                  groupValue: formaPagamento,
                   onChanged: isSold
                       ? null
                       : (value) {
@@ -136,7 +136,7 @@ class _RifaPageState extends State<RifaPage> {
                 Text('Pix'),
                 Radio(
                   value: 'Dinheiro',
-                  groupValue: isSold ? formaPagamento : null,
+                  groupValue: formaPagamento,
                   onChanged: isSold
                       ? null
                       : (value) {
