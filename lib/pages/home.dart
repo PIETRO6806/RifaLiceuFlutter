@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rifa_liceu_flutter/api/api_service.dart';
+import 'package:rifa_liceu_flutter/utils/user_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -66,6 +67,7 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
+      drawer: UserPreferencesDrawer(), // Adding UserPreferencesDrawer to the drawer
     );
   }
 }
@@ -97,3 +99,60 @@ class ClickableCard extends StatelessWidget {
     );
   }
 }
+
+class UserPreferencesDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Informações',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                FutureBuilder<Map<String, dynamic>>(
+                  future: UserPreferences.getUserInfo(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error loading user information');
+                    } else {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Olá, ${snapshot.data?['userName'] ?? ''}.',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          Text(
+                            'Você vendeu ${snapshot.data?['userRifas'] ?? 0} rifas.',
+                            style: TextStyle(fontSize: 20),
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// The rest of the code remains unchanged
