@@ -134,4 +134,25 @@ class ApiService {
     }
   }
 
+  static Future<int> getNumberOfRifas() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/api/rifas/count'),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the response body to get the number of rifas as an integer
+        return int.parse(response.body);
+      } else {
+        // Handle other status codes or errors
+        print('Error: ${response.statusCode}');
+        return 0; // Return 0 in case of an error
+      }
+    } catch (e) {
+      print('Error: $e');
+      return 0; // Return 0 in case of an exception
+    }
+  }
+
 }

@@ -11,11 +11,20 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<int> soldRifaNumbers = [];
+  int totalNumberOfRifas = 0;
 
   @override
   void initState() {
     super.initState();
     _loadSoldRifaNumbers();
+    _loadTotalNumberOfRifas();
+  }
+
+  Future<void> _loadTotalNumberOfRifas() async {
+    final int totalRifas = await ApiService.getNumberOfRifas();
+    setState(() {
+      totalNumberOfRifas = totalRifas;
+    });
   }
 
   Future<void> _loadSoldRifaNumbers() async {
@@ -67,7 +76,9 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
-      drawer: UserPreferencesDrawer(), // Adding UserPreferencesDrawer to the drawer
+      drawer: UserPreferencesDrawer(
+        totalNumberOfRifas: totalNumberOfRifas,
+      ),
     );
   }
 }
@@ -101,6 +112,10 @@ class ClickableCard extends StatelessWidget {
 }
 
 class UserPreferencesDrawer extends StatelessWidget {
+  final int totalNumberOfRifas;
+
+  UserPreferencesDrawer({required this.totalNumberOfRifas});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -115,7 +130,7 @@ class UserPreferencesDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Informações',
+                  '3ª Série A (EM)',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -149,10 +164,111 @@ class UserPreferencesDrawer extends StatelessWidget {
               ],
             ),
           ),
+          ListTile(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Total de rifas vendidas:',
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(height: 8.0),
+                Center(
+                  child: Text(
+                    '$totalNumberOfRifas',
+                    style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            onTap: () {
+              // Handle tap if needed
+            },
+          ),
+          SizedBox(height: 0), // Add some spacing
+          Center(
+            child: Text(
+              'Prêmio:',
+              style: TextStyle(fontSize: 20),
+            ),
+          ),
+          SizedBox(height: 0), // Add some spacing
+          Center(
+            child: Text(
+              'Box com ovo trufado e nove pães de mel da Santa Chocolateria',
+              style: TextStyle(fontSize: 15),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 20), // Add some spacing
+          Center(
+            child: Text(
+              'Compras até dia 17 de março.',
+              style: TextStyle(fontSize: 15),
+            ),
+          ),
+          SizedBox(height: 8.0),
+          Center(
+            child: Text(
+              'Sorteio dia 22 de março.',
+              style: TextStyle(fontSize: 15),
+            ),
+          ),
+          SizedBox(height: 8.0),
+          Center(
+            child: Text(
+              '(Apenas UM ganhador)',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w100),
+            ),
+          ),
+          SizedBox(height: 20), // Add some spacing
+          Container(
+            color: Colors.orange, // Set the background color to orange
+            padding: EdgeInsets.all(16.0), // Adjust padding as needed
+            child: Center(
+              child: Text(
+                '5 reais cada rifa ou 3 números por um ovo 150g sem brinquedo',
+                style: TextStyle(fontSize: 15, color: Colors.white), // Set text color to white for better visibility
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          SizedBox(height: 60), // Add some spacing
+          Center(
+            child: Text(
+              'Seja o coelhinho',
+              style: TextStyle(
+                fontSize: 25,
+                fontStyle: FontStyle.italic,
+                color: Colors.blue,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Center(
+            child: Text(
+              ' da Páscoa de muitas',
+              style: TextStyle(
+                fontSize: 25,
+                fontStyle: FontStyle.italic,
+                color: Colors.blue,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Center(
+            child: Text(
+              'crianças!',
+              style: TextStyle(
+                fontSize: 25,
+                fontStyle: FontStyle.italic,
+                color: Colors.blue,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
         ],
       ),
     );
   }
 }
-
-// The rest of the code remains unchanged
